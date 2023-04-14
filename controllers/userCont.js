@@ -1,3 +1,4 @@
+const { log } = require('console');
 const { User}= require('../models');
 
 const userCont = {
@@ -38,6 +39,27 @@ const userCont = {
             .then(userData => res.json(userData))
             .catch(err => res.json(err));
     },
+    updateUser({params,body }, res) {
+        User.findByIdAndUpdate(
+            params.id ,
+            { $set: { username: body.username } },
+            { new: true }
+        )
+        .then(userData => {
+            console.log(userData)
+            if(!userData){
+                res.status(404).json({ message: 'User not found' });
+                console.log(userData);
+                return;
+            }
+            res.json(userData);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(400).json({ message: 'Error updating user name' });
+        });
+    },
+   
     addFriend({ params }, res){
         User.findOneAndUpdate(
             { _id: params.userId },

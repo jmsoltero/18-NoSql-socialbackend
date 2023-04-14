@@ -12,12 +12,16 @@ const UserSchema = new Schema(
             type: String,
             required: true,
             unique: true,
-            validate: [validateEmail, 'Please fill a valid email address'],
-            match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+            validate: {
+                validator: function (v) {
+                    return /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(v);
+                },
+                message: props => `${props.value} is not a valid email address!`
+            },
         },
         thoughts: [
             {
-                type: Schema.type.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: 'Thought',
             },
         ],
