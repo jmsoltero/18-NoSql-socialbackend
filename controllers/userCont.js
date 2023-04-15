@@ -1,4 +1,3 @@
-const { log } = require('console');
 const { User}= require('../models');
 
 const userCont = {
@@ -59,11 +58,40 @@ const userCont = {
             res.status(400).json({ message: 'Error updating user name' });
         });
     },
+    deleteUser({ params }, res) {
+        User.findByIdAndDelete(params.id)
+            .then(userData => {
+                if (!userData) {
+                    res.status(404).json({ message: 'User not found' });
+                    return;
+                }
+                res.json(userData);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).json({ message: 'Error deleting user' });
+            });
+    },
    
     addFriend({ params }, res){
         User.findOneAndUpdate(
             { _id: params.userId },
             { $push: { friends: params.friendId }},
+            { new: true }
+        )
+        .then((userData) => {
+            if(!userData){
+                res.status(404).json();
+                return;
+            }
+            res.json(userData);
+        })
+        .catch((err) => res.status(400).json(err));
+    },
+    removeFriend({ params }, res){
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $pull: { friends: params.friendId }},
             { new: true }
         )
         .then((userData) => {
